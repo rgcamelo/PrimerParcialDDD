@@ -41,6 +41,16 @@ namespace Domain.test
         }
 
         [Test]
+        public void RegistrarCreditoIncorrectoPlazoPagoSuperiorAlLimite()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+
+            string mensaje = credito.RegistrarCredito(empleado, 9000000, DateTime.Now, 11);
+            Assert.AreEqual(mensaje, "El plazo de pago incorrecto");
+        }
+
+        [Test]
         public void RegistrarCreditoCorrecto()
         {
             Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
@@ -57,6 +67,16 @@ namespace Domain.test
             credito.RegistrarCredito(empleado, 9000000, DateTime.Now, 5);
             string mensaje = credito.RegistrarAbono(-22000000);
             Assert.AreEqual(mensaje, "Valor del abono incorrecto");
+        }
+
+        [Test]
+        public void RegistrarAbonoPagoExcedido()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 10);
+            string mensaje = credito.RegistrarAbono(11000000);
+            Assert.AreEqual("Valor del abono incorrecto", mensaje);
         }
 
         [Test]
@@ -80,6 +100,8 @@ namespace Domain.test
             Cuota cuota2 = credito.ListaCuota.Find(cuota => cuota.EstadoCuota == false);
             Assert.AreEqual(cuota2.ValorPagado, 1000000);
         }
+
+        
 
         [Test]
         public void ConsultarCuotas()
