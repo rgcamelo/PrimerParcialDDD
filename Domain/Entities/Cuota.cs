@@ -23,7 +23,7 @@ namespace Domain.Entities
         {
             ValorPagado -= valor;
 
-            if(ValorPagado < 0)
+            if(ValorPagado <= 0)
             {
                 EstadoCuota = true;
                 var Pagar = ValorPagado;

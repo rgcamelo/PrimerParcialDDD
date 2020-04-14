@@ -139,6 +139,62 @@ namespace Domain.test
             CollectionAssert.AreEqual(Cuotas, credito.ConsultarCuotas());
         }
 
+
+        [Test]
+        public void ConsultarCuotasConAbonosRealizadosSegundaPrueba()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 5);
+            credito.RegistrarAbono(8200000);
+
+
+            var Cuotas = new List<string>() {
+                "Cuota No: 0 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 1 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 2 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 3 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 4 - Valor de la Cuota: 2050000 - Valor por Pagar: 2050000 - Estado de Pago: False"
+            };
+
+
+            CollectionAssert.AreEqual(Cuotas, credito.ConsultarCuotas());
+        }
+
+        [Test]
+        public void ConsultarCuotasConAbonosRealizadosTerceeraPrueba()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 5);
+            credito.RegistrarAbono(10250000);
+
+
+            var Cuotas = new List<string>() {
+                "Cuota No: 0 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 1 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 2 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 3 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True",
+                "Cuota No: 4 - Valor de la Cuota: 2050000 - Valor por Pagar: 0 - Estado de Pago: True"
+            };
+
+
+            CollectionAssert.AreEqual(Cuotas, credito.ConsultarCuotas());
+        }
+
+        [Test]
+        public void ConsultarCuotasConAbonosRealizadoCuartaPrueba()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 5);
+            credito.RegistrarAbono(10250000);
+            string mensaje = credito.RegistrarAbono(2050000);
+
+
+            Assert.AreEqual("Valor del abono incorrecto", mensaje);
+        }
+
         [Test]
         public void ConsultarAbonosRealizados()
         {
