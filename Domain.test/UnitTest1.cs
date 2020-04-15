@@ -101,7 +101,20 @@ namespace Domain.test
             Assert.AreEqual(cuota2.ValorPagado, 1000000);
         }
 
-        
+        [Test]
+        public void RealizarAbonoCreditoPagado()
+        {
+            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
+            Credito credito = new Credito();
+            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 5);
+            credito.RegistrarAbono(10250000);
+            string mensaje = credito.RegistrarAbono(2050000);
+
+
+            Assert.AreEqual("Credito Pagado", mensaje);
+        }
+
+
 
         [Test]
         public void ConsultarCuotas()
@@ -182,18 +195,7 @@ namespace Domain.test
             CollectionAssert.AreEqual(Cuotas, credito.ConsultarCuotas());
         }
 
-        [Test]
-        public void ConsultarCuotasConAbonosRealizadoCuartaPrueba()
-        {
-            Empleado empleado = new Empleado("1065846150", "Rafael Camelo", "1000000");
-            Credito credito = new Credito();
-            credito.RegistrarCredito(empleado, 10000000, DateTime.Now, 5);
-            credito.RegistrarAbono(10250000);
-            string mensaje = credito.RegistrarAbono(2050000);
-
-
-            Assert.AreEqual("Valor del abono incorrecto", mensaje);
-        }
+        
 
         [Test]
         public void ConsultarAbonosRealizados()

@@ -11,6 +11,7 @@ namespace Domain.Entities
         public double ValorCredito { get; set; }
         public double ValorAPagar { get; set; }
         public double SaldoAPagar { get; set; }
+        public bool CreditoPagado { get; set; }
         public List<Abono> ListaAbonos { get; set; }
         public List<Cuota> ListaCuota { get; set; }
         public int PlazoDePago { get; set; } 
@@ -24,6 +25,7 @@ namespace Domain.Entities
         {
             ListaAbonos = new List<Abono>();
             ListaCuota = new List<Cuota>();
+            CreditoPagado = false;
         }
 
         public string RegistrarCredito (Empleado empleado, double valorCredito, DateTime fechaCredito,int plazodepago)
@@ -64,22 +66,33 @@ namespace Domain.Entities
 
         public string RegistrarAbono(double valorAbonado)
         {
-            Cuota cuota = ListaCuota.Find(cuota => cuota.EstadoCuota == false);
-            if ( valorAbonado > 0 && valorAbonado <= SaldoAPagar)
+            if(CreditoPagado == false)
             {
-                if ( valorAbonado >= cuota.ValorCuota)
+                Cuota cuota = ListaCuota.Find(cuota => cuota.EstadoCuota == false);
+                if (valorAbonado > 0 && valorAbonado <= SaldoAPagar)
                 {
-                    double sobrante = cuota.PagarCuota(valorAbonado);
+                    if (valorAbonado >= cuota.ValorCuota)
+                    {
+                        double sobrante = cuota.PagarCuota(valorAbonado);
 
-                    PagarAbonoSobrante(sobrante);
+                        PagarAbonoSobrante(sobrante);
 
-                    SaldoAPagar -= valorAbonado;
-                    Abono abono = new Abono(valorAbonado);
-                    ListaAbonos.Add(abono);
+                        SaldoAPagar -= valorAbonado;
+                        if(SaldoAPagar == 0)
+                        {
+                            CreditoPagado = true;
+                        }
+                        Abono abono = new Abono(valorAbonado);
+                        ListaAbonos.Add(abono);
 
 
 
-                    return "Valor del abono Correcto  Abono registrado";
+                        return "Valor del abono Correcto  Abono registrado";
+                    }
+                    else
+                    {
+                        return "Valor del abono incorrecto";
+                    }
                 }
                 else
                 {
@@ -88,8 +101,9 @@ namespace Domain.Entities
             }
             else
             {
-                return "Valor del abono incorrecto";
+                return "Credito Pagado";
             }
+            
         }
 
         public void PagarAbonoSobrante(double sobrante)
