@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Domain.Base;
 
@@ -7,7 +8,7 @@ namespace Domain.Entities
 {
     public class Credito : Entity<int>
     {
-        public Empleado Empleado { get; set; }
+
         public double ValorCredito { get; set; }
         public double ValorAPagar { get; set; }
         public double SaldoAPagar { get; set; }
@@ -26,42 +27,51 @@ namespace Domain.Entities
             ListaAbonos = new List<Abono>();
             ListaCuota = new List<Cuota>();
             CreditoPagado = false;
+            FechaCredito = DateTime.Now;
         }
 
-        public string RegistrarCredito (Empleado empleado, double valorCredito, DateTime fechaCredito,int plazodepago)
+        public IReadOnlyList<string> CanRegistrarCredito(double valorCredito, int plazodepago)
         {
-            if( (valorCredito >= MINIMO_CREDITO) && ( valorCredito  <= MAXIMO_CREDITO))
+            var errors = new List<string>();
+
+            if((valorCredito >= MINIMO_CREDITO) && (valorCredito <= MAXIMO_CREDITO))
             {
-                if (plazodepago > 0 && plazodepago <= 10)
-                {
-                    PlazoDePago = plazodepago;
-                    FechaCredito = fechaCredito;
-                    ValorCredito = valorCredito;
-                    ValorAPagar = valorCredito * (1 + TASADEINTERES * plazodepago);
-                    SaldoAPagar = ValorAPagar;
-
-                    double valorporCuota = ValorAPagar / plazodepago;
-
-                    for (int i = 0; i < plazodepago; i++)
-                    {
-                        Cuota cuota = new Cuota(valorporCuota);
-                        cuota.NumeroCuota = i;
-                        ListaCuota.Add(cuota);
-                    }
-
-                    return $"Valor Total a pagar {ValorAPagar}, Credito Registrado Correctamente";
-
-                }
-                else
-                {
-                    return "El plazo de pago incorrecto";
-                }
-            }
-            else
-            {
-                return "El valor del crédito debe estar entre 5 millones y 10 millones";
+                errors.Add("El Valor del credito debe estar entre 5 millones y 10 millones");
             }
 
+            if(plazodepago > 0 && plazodepago <= 10)
+            {
+                errors.Add("El plazo de pago incorrecto");
+            }
+
+            return errors;
+            
+        }
+
+        public void RegistrarCredito(double valorCredito, int plazodepago)
+        {
+            if(CanRegistrarCredito(valorCredito, plazodepago).Any())
+            {
+                throw new InvalidOperationException();
+            }
+
+            PlazoDePago = plazodepago;
+            ValorCredito = valorCredito;
+            ValorAPagar = ValorCredito * (1 + TASADEINTERES * plazodepago);
+            SaldoAPagar = ValorAPagar;
+            double valorporCuota = ValorAPagar / plazodepago;
+            GenerarCuotas(plazodepago, valorporCuota);
+
+        }
+
+        public void GenerarCuotas(int plazodepago, double valorporcuota )
+        {
+            for (int i = 0; i < plazodepago; i++)
+            {
+                Cuota cuota = new Cuota(valorporcuota);
+                cuota.NumeroCuota = i;
+                ListaCuota.Add(cuota);
+            }
         }
 
         public string RegistrarAbono(double valorAbonado)
@@ -145,10 +155,41 @@ namespace Domain.Entities
             return Abonos;
         }
 
-        
+        public string RegistrarCredito(Empleado empleado, double valorCredito, int plazodepago)
+        {
+            if ((valorCredito >= MINIMO_CREDITO) && (valorCredito <= MAXIMO_CREDITO))
+            {
+                if (plazodepago > 0 && plazodepago <= 10)
+                {
+                    PlazoDePago = plazodepago;
+                    ValorCredito = valorCredito;
+                    ValorAPagar = valorCredito * (1 + TASADEINTERES * plazodepago);
+                    SaldoAPagar = ValorAPagar;
 
+                    double valorporCuota = ValorAPagar / plazodepago;
 
+                    for (int i = 0; i < plazodepago; i++)
+                    {
+                        Cuota cuota = new Cuota(valorporCuota);
+                        cuota.NumeroCuota = i;
+                        ListaCuota.Add(cuota);
+                    }
 
-        
+                    return $"Valor Total a pagar {ValorAPagar}, Credito Registrado Correctamente";
+
+                }
+                else
+                {
+                    return "El plazo de pago incorrecto";
+                }
+            }
+            else
+            {
+                return "El valor del crédito debe estar entre 5 millones y 10 millones";
+            }
+
+        }
+
     }
+
 }
